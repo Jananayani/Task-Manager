@@ -4,10 +4,12 @@ import com.example.spring_project2.dto.TaskDto;
 import com.example.spring_project2.entity.TaskStatus;
 import com.example.spring_project2.entity.Tasks;
 import com.example.spring_project2.service.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.config.Task;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -22,7 +24,12 @@ public class TaskController {
     private TaskService taskService;
 
     @PostMapping
-    public ResponseEntity<String> createTask(@RequestBody TaskDto request) {
+    public ResponseEntity<String> createTask(@Valid  @RequestBody TaskDto request, BindingResult result) {
+        if (result.hasErrors()) {
+            String errorMessage = result.getFieldError().getDefaultMessage();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+        }
+
         try {
             Tasks task = new Tasks();
             task.setTitle(request.getTitle());
